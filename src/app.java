@@ -139,18 +139,20 @@ class Stock {
         instances.add(this);
     }
 
-    int GetStockPrice(){
+    int GetStockPrice() {
         return this.StockPrice;
     }
-    int GetStockCode(){
+
+    int GetStockCode() {
         return this.StockCode;
     }
-    String GetStockName(){
+
+    String GetStockName() {
         return this.StockName;
     }
 
     void updatePrice() {
-        int change = rand.nextInt((int)(this.StockPrice * 0.3));
+        int change = rand.nextInt((int) (this.StockPrice * 0.3));
         if (rand.nextBoolean()) {
             this.StockPrice += change;
         } else {
@@ -233,7 +235,6 @@ class Stock {
     }
 
     static class User {
-        public static HashMap<Object, Object> loggedInAccount;
         private static HashMap<String, BankAccount> loggedInAccounts = new HashMap<>();
 
         static void printAllStocks() {
@@ -318,7 +319,7 @@ public class app {
                     System.out.print("비밀번호: ");
                     password = scanner.nextLine();
                     Stock.User.login(id, password);
-                    if (Stock.User.loggedInAccount.containsKey(id)) {
+                    if (Stock.User.loggedInAccounts.containsKey(id)) {
                         do {
                             System.out.println("1. 입금");
                             System.out.println("2. 출금");
