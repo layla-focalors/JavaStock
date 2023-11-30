@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Random;
 
 interface Account {
     int getBalance();
@@ -74,10 +75,12 @@ class BankAccount implements Account {
     private int balance;
     private String password;
     private Card card;
+    private String accountNumber;
 
-    BankAccount(String password) {
+    BankAccount(String password, String accountNumber) {
         this.balance = 0;
         this.password = password;
+        this.accountNumber = accountNumber;
     }
 
     @Override
@@ -116,6 +119,10 @@ class BankAccount implements Account {
     public Card getCard() {
         return this.card;
     }
+
+    public String getAccountNumber() {
+        return this.accountNumber;
+    }
 }
 
 class Stock {
@@ -123,6 +130,7 @@ class Stock {
     int StockCode;
     int StockPrice;
     private static List<Stock> instances = new ArrayList<>();
+    private static Random rand = new Random();
 
     private Stock(String name, int code, int price) {
         this.StockName = name;
@@ -141,9 +149,19 @@ class Stock {
         return this.StockName;
     }
 
+    void updatePrice() {
+        int change = rand.nextInt((int)(this.StockPrice * 0.3));
+        if (rand.nextBoolean()) {
+            this.StockPrice += change;
+        } else {
+            this.StockPrice -= change;
+        }
+    }
+
     static class Manager {
         private static HashMap<String, BankAccount> accounts = new HashMap<>();
         private static HashMap<String, String> users = new HashMap<>();
+        private static int lastAccountNumber = 0;
 
         static Stock createStock(String name, int code, int price) {
             Stock stock = new Stock(name, code, price);
@@ -160,7 +178,10 @@ class Stock {
                 return null;
             }
 
-            BankAccount account = new BankAccount(password);
+            String accountNumber = String.format("%03d-%04d-%04d", lastAccountNumber / 1000000, (lastAccountNumber / 10000) % 100, lastAccountNumber % 10000);
+            lastAccountNumber++;
+
+            BankAccount account = new BankAccount(password, accountNumber);
             accounts.put(id, account);
             return account;
         }
@@ -180,13 +201,13 @@ class Stock {
             account.issueCard(cardType, password);
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("user.txt", true))) {
-                writer.write(id + " " + password + "\n");
+                writer.write(id + "|" + password + "\n");
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("account.txt", true))) {
-                writer.write(id + " " + "000-0000-0000" + " " + password + "\n");
+                writer.write(id + "|" + account.getAccountNumber() + "|" + password + "\n");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -268,6 +289,9 @@ public class app {
         String cardType = "";
         int choice = 0;
 
+        // 관리자 계정 생성
+        Stock.Manager.register("root", "root", "", "");
+
         do {
             System.out.println("1. 회원가입");
             System.out.println("2. 로그인");
@@ -322,7 +346,7 @@ public class app {
                                     Stock.User.printAllStocks();
                                     break;
                                 case 4:
-                                    // 매도 코드를 여기에 작성하세요.
+                                    // 매도 코드g
                                     break;
                             }
                         } while (choice != 5);
