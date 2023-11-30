@@ -1,5 +1,45 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+interface Account {
+    int getBalance();
+    void deposit(int amount);
+    void withdraw(int amount);
+}
+
+class BankAccount implements Account {
+    private int balance;
+    private String password;
+
+    BankAccount(String password) {
+        this.balance = 0;
+        this.password = password;
+    }
+
+    @Override
+    public int getBalance() {
+        return this.balance;
+    }
+
+    @Override
+    public void deposit(int amount) {
+        this.balance += amount;
+    }
+
+    @Override
+    public void withdraw(int amount) {
+        if (this.balance >= amount) {
+            this.balance -= amount;
+        } else {
+            System.out.println("Insufficient balance");
+        }
+    }
+
+    public boolean checkPassword(String password) {
+        return this.password.equals(password);
+    }
+}
 
 class Stock {
     String StockName;
@@ -34,6 +74,27 @@ class Stock {
         static List<Stock> getStocks() {
             return stocks;
         }
+
+        public static BankAccount getAccount(String id) {
+            return null;
+        }
+    }
+
+    private static HashMap<String, BankAccount> accounts = new HashMap<>();
+
+    static BankAccount createAccount(String id, String password) {
+        if (accounts.containsKey(id)) {
+            System.out.println("Account already exists");
+            return null;
+        }
+
+        BankAccount account = new BankAccount(password);
+        accounts.put(id, account);
+        return account;
+    }
+
+    static BankAccount getAccount(String id) {
+        return accounts.get(id);
     }
     static class User {
         static void printAllStocks() {
@@ -45,9 +106,21 @@ class Stock {
             }
         }
     }
+    private static HashMap<String, BankAccount> loggedInAccounts = new HashMap<>();
+
+    static void login(String id, String password) {
+        BankAccount account = Manager.getAccount(id);
+        if (account != null && account.checkPassword(password)) {
+            loggedInAccounts.put(id, account);
+        } else {
+            System.out.println("Invalid id or password");
+        }
+    }
 }
 public class app {
     public static void main(String[] args){
-
+        Stock.Manager.createStock("Apple", 1, 100);
+        Stock.Manager.createStock("Google", 2, 200);
+        Stock.User.printAllStocks();
     }
 }
