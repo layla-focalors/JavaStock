@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Scanner;
 
 interface Account {
     int getBalance();
@@ -211,6 +212,7 @@ class Stock {
     }
 
     static class User {
+        public static HashMap<Object, Object> loggedInAccount;
         private static HashMap<String, BankAccount> loggedInAccounts = new HashMap<>();
 
         static void printAllStocks() {
@@ -254,5 +256,81 @@ class Stock {
                 System.out.println("Not logged in");
             }
         }
+    }
+}
+
+public class app {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String id = "";
+        String password = "";
+        String address = "";
+        String cardType = "";
+        int choice = 0;
+
+        do {
+            System.out.println("1. 회원가입");
+            System.out.println("2. 로그인");
+            System.out.println("3. 종료");
+            System.out.print("선택: ");
+            choice = scanner.nextInt();
+            scanner.nextLine();  // consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("아이디: ");
+                    id = scanner.nextLine();
+                    System.out.print("비밀번호: ");
+                    password = scanner.nextLine();
+                    System.out.print("주소: ");
+                    address = scanner.nextLine();
+                    System.out.print("카드 종류: ");
+                    cardType = scanner.nextLine();
+                    Stock.Manager.register(id, password, address, cardType);
+                    break;
+                case 2:
+                    System.out.print("아이디: ");
+                    id = scanner.nextLine();
+                    System.out.print("비밀번호: ");
+                    password = scanner.nextLine();
+                    Stock.User.login(id, password);
+                    if (Stock.User.loggedInAccount.containsKey(id)) {
+                        do {
+                            System.out.println("1. 입금");
+                            System.out.println("2. 출금");
+                            System.out.println("3. 매수");
+                            System.out.println("4. 매도");
+                            System.out.println("5. 로그아웃");
+                            System.out.print("선택: ");
+                            choice = scanner.nextInt();
+                            scanner.nextLine();  // consume newline
+
+                            switch (choice) {
+                                case 1:
+                                    System.out.print("입금액: ");
+                                    int depositAmount = scanner.nextInt();
+                                    scanner.nextLine();  // consume newline
+                                    Stock.Manager.getAccount(id).deposit(depositAmount);
+                                    break;
+                                case 2:
+                                    System.out.print("출금액: ");
+                                    int withdrawAmount = scanner.nextInt();
+                                    scanner.nextLine();  // consume newline
+                                    Stock.Manager.getAccount(id).withdraw(withdrawAmount);
+                                    break;
+                                case 3:
+                                    Stock.User.printAllStocks();
+                                    break;
+                                case 4:
+                                    // 매도 코드를 여기에 작성하세요.
+                                    break;
+                            }
+                        } while (choice != 5);
+                    }
+                    break;
+            }
+        } while (choice != 3);
+
+        scanner.close();
     }
 }
